@@ -5,14 +5,44 @@ date: "March 8, 2019"
 output: html_document
 ---
 
-hi
-hello
-hi
 ```{r, message = FALSE}
+library(tidyverse)
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
+```
 
+```{r}
+elections_florida <- 
+  house_elections %>%
+  filter(state == "FL") %>%
+  select(fec_id, candidate_name, party, general_votes, ge_winner) 
+
+candidates_florida <- 
+  candidates %>%
+  filter(cand_office_state == "FL", cand_election_yr >= 2011 & cand_election_yr <= 2012) %>%
+  select(cand_id, cand_election_yr, cand_office_state, cand_office_district)
+
+candidates_elections_florida <- 
+  merge(elections_florida, candidates_florida, by.x="fec_id", by.y="cand_id") %>%
+  filter(ge_winner == "W") %>%
+  arrange(desc(cand_office_district))
 
 ```
+
+```{r}
+committees_florida <-
+  committees %>%
+  select(cmte_id, cmte_name)
+
+contributions_florida <-
+  contributions %>%
+  select(cmte_id, transaction_type, name, transaction_amt, cand_id) 
+
+committees_contributions_florida <- committees_florida %>%
+  full_join(contributions_florida, by = "cmte_id")
+
+```
+
+
