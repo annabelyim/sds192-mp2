@@ -5,7 +5,7 @@ date: "March 8, 2019"
 output: html_document
 ---
 
-```{r, message = FALSE}
+```{r, message = FALSE, warning = FALSE, include=FALSE}
 library(tidyverse)
 load("house_elections.rda")
 load("candidates.rda")
@@ -13,7 +13,7 @@ load("committees.rda")
 load("contributions.rda")
 ```
 
-```{r}
+```{r warning = FALSE}
 elections_florida <- 
   house_elections %>%
   filter(state == "FL") %>%
@@ -30,7 +30,7 @@ candidates_elections_florida <-
 
 ```
 
-```{r}
+```{r warning = FALSE}
 committees_florida <-
   committees %>%
   select(cmte_id, cmte_name)
@@ -46,7 +46,7 @@ committees_contributions_florida <- committees_florida %>%
   summarize(total_transaction = sum(transaction_amt))
 ```
 
-```{r}
+```{r warning = FALSE}
 combined_candidates_contributions <-
   merge(candidates_elections_florida, committees_contributions_florida, by.x="fec_id", by.y="cand_id") %>%
   group_by(party) %>%
@@ -54,4 +54,4 @@ combined_candidates_contributions <-
             total_transaction_per_party = sum(total_transaction))
 ```
 
-combined_candidates_contributions    is the data fram that we will probably use to graph things. 
+combined_candidates_contributions is the data fram that we will probably use to graph things. 
