@@ -2,10 +2,12 @@
 title: "mini-project-2"
 author: "Kiara Correa Acosta, Annabel Yim, Syrine Matoussi"
 date: "March 8, 2019"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
 ---
 
-```{r, message = FALSE, warning = FALSE, include=FALSE}
+```{r, message = FALSE, warning = FALSE, include=FALSE, echo = TRUE}
 library(tidyverse)
 load("house_elections.rda")
 load("candidates.rda")
@@ -13,7 +15,7 @@ load("committees.rda")
 load("contributions.rda")
 ```
 
-```{r warning = FALSE}
+```{r warning = FALSE, echo = TRUE}
 elections_florida <- 
   house_elections %>%
   filter(state == "FL") %>%
@@ -30,7 +32,7 @@ candidates_elections_florida <-
 
 ```
 
-```{r warning = FALSE}
+```{r warning = FALSE, echo = TRUE}
 committees_florida <-
   committees %>%
   select(cmte_id, cmte_name)
@@ -46,7 +48,7 @@ committees_contributions_florida <- committees_florida %>%
   summarize(total_transaction = sum(transaction_amt))
 ```
 
-```{r warning = FALSE}
+```{r warning = FALSE, echo = TRUE}
 combined_candidates_contributions <-
   merge(candidates_elections_florida, committees_contributions_florida, by.x="fec_id", by.y="cand_id") %>%
   group_by(party) %>%
