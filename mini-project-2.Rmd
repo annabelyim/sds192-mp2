@@ -26,8 +26,7 @@ candidates_florida <-
 
 candidates_elections_florida <- 
   merge(elections_florida, candidates_florida, by.x="fec_id", by.y="cand_id") %>%
-  filter(ge_winner == "W") %>%
-  arrange(desc(cand_office_district))
+  filter(ge_winner == "W") 
 
 ```
 
@@ -37,12 +36,22 @@ committees_florida <-
   select(cmte_id, cmte_name)
 
 contributions_florida <-
-  contributions %>%
+  contributions %>% 
+  filter(transaction_type != "24A") %>%
   select(cmte_id, transaction_type, name, transaction_amt, cand_id) 
 
 committees_contributions_florida <- committees_florida %>%
-  full_join(contributions_florida, by = "cmte_id")
-
+  full_join(contributions_florida, by = "cmte_id") %>%
+  group_by(cand_id) %>%
+  summarize(total_transaction = sum(transaction_amt))
 ```
 
+```{r}
+combined_candidates_contributions <-
+  merge(candidates_elections_florida, committees_contributions_florida, by.x="fec_id", by.y="cand_id") %>%
+  group_by(party) %>%
+  summarize(num_districts_won = n(), 
+            total_transaction_per_party = sum(total_transaction))
+```
 
+combined_candidates_contributions    is the data fram that we will probably use to graph things. 
