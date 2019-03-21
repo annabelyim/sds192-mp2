@@ -39,16 +39,19 @@ candidates_elections_florida <-
 committees_florida <-
   committees %>%
   select(cmte_id, cmte_name)
+# Selecting the columns that are relavent for final data graphic. 
 
 contributions_florida <-
   contributions %>% 
   filter(transaction_type != "24A") %>%
   select(cmte_id, transaction_type, name, transaction_amt, cand_id) 
+# We are only looking at transactions that were made for the candidate, not opposed. Thus, filtering out transaction_type 24A. Then, selected columns that are relavent for final data graphic. 
 
 committees_contributions_florida <- committees_florida %>%
   full_join(contributions_florida, by = "cmte_id") %>%
   group_by(cand_id) %>%
   summarize(total_transaction = sum(transaction_amt))
+# joined committees_florida and contributions_florida by cmte_id. Then, in order find out the total transactions received by each candidate from different committees, grouped the joined data frame by cand_id, and then summarized the transaction amount to find the total transaction made per candidate.  
 ```
 
 ```{r warning = FALSE, echo = TRUE}
@@ -57,6 +60,5 @@ combined_candidates_contributions <-
   group_by(party) %>%
   summarize(num_districts_won = n(), 
             total_transaction_per_party = sum(total_transaction))
+# In order to match the transaction amount to the candidates, merged the two data frames to get the information about the candidate and the transaction amount to be combined in one data frame. Then, in order to find how many districts were won by Democrats and Republicans, we grouped the data frame by party, and then found how many Democrats and Republicans won by using the summarize function by finding the number of rows that were either Democrats or Republicans. 
 ```
-
-combined_candidates_contributions is the data fram that we will probably use to graph things. 
