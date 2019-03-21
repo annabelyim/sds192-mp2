@@ -20,15 +20,18 @@ elections_florida <-
   house_elections %>%
   filter(state == "FL") %>%
   select(fec_id, candidate_name, party, general_votes, ge_winner) 
+# We are working with only swing states. First, we are using Florida, thus we filtered out the state Florida. Then, we only selected columns that may be relavent to our graph. Incumbent, runoff_votes, primary_votes, and other columns are not necessary for our purpose.
 
 candidates_florida <- 
   candidates %>%
   filter(cand_office_state == "FL", cand_election_yr >= 2011 & cand_election_yr <= 2012) %>%
   select(cand_id, cand_election_yr, cand_office_state, cand_office_district)
+# The candidates data set doesn't filter out election cycle 2011-2012, so we filtered out the years to be between 2011-2012. Also, Florida was also filtered. Then, we selected column that may be relavent to our graph. 
 
 candidates_elections_florida <- 
   merge(elections_florida, candidates_florida, by.x="fec_id", by.y="cand_id") %>%
   filter(ge_winner == "W") 
+# Because fec_id = cand_id, we used the merge function to combine both elections_florida and candidates_florida data sets. Also, since we want only the winners of the elections, we filtered out the winners using the filter function. 
 
 ```
 
