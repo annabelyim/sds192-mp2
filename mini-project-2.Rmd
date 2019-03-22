@@ -16,7 +16,7 @@ load("contributions.rda")
 ```
 
 # Florida
-```{r warning = FALSE, echo = TRUE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
 elections_florida <- 
   house_elections %>%
   filter(state == "FL") %>%
@@ -36,7 +36,7 @@ candidates_elections_florida <-
 
 ```
 
-```{r warning = FALSE, echo = TRUE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
 committees_florida <-
   committees %>%
   select(cmte_id, cmte_name)
@@ -55,23 +55,23 @@ committees_contributions_florida <- committees_florida %>%
 # joined committees_florida and contributions_florida by cmte_id. Then, in order find out the total transactions received by each candidate from different committees, grouped the joined data frame by cand_id, and then summarized the transaction amount to find the total transaction made per candidate.  
 ```
 
-```{r warning = FALSE, echo = TRUE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
 combined_candidates_contributions <-
   merge(candidates_elections_florida, committees_contributions_florida, by.x="fec_id", by.y="cand_id") %>%
-  group_by(party) %>%
+  group_by(party, cand_office_state) %>%
   summarize(num_districts_won = n(), 
             total_transaction_per_party = sum(total_transaction)/1000000)
 # In order to match the transaction amount to the candidates, merged the two data frames to get the information about the candidate and the transaction amount to be combined in one data frame. Then, in order to find how many districts were won by Democrats and Republicans, we grouped the data frame by party, and then found how many Democrats and Republicans won by using the summarize function by finding the number of rows that were either Democrats or Republicans. 
 ```
 
-```{r message=FALSE,warning = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
 ggplot(data= combined_candidates_contributions, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party))+ geom_area(size=7)+labs(title= "1. Florida", face="bold",size=25)+labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
 
 # Functions
 
-```{r message=FALSE,warning = FALSE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
 elec_contrib <- function(state_arg){
 elections_per_state <-
  house_elections %>%
@@ -103,13 +103,15 @@ committees_contributions_per_state <- committees_per_state %>%
 
 combined_candidates_contributions <-
  merge(candidates_elections_per_state, committees_contributions_per_state, by.x="fec_id", by.y="cand_id") %>%
- group_by(party) %>%
+ group_by(party, cand_office_state = state_arg) %>%
  summarize(num_districts_won = n(),
-           total_transaction_per_party = sum(total_transaction)/1000000)
+           total_transaction_per_party = sum(total_transaction)/1000000)}
 
-ggplot(data= combined_candidates_contributions, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party))+ geom_area(size=7)+labs(title= state_arg, face="bold",size=25)+labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())}
 actual_states <- c("FL","CO","NV","OH","IA","MI","MN","NH","NC","WI","PA","VA")
-map(actual_states, elec_contrib )
+
+my_data <- map_df(actual_states, elec_contrib) 
+
+  ggplot(data= my_data, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party)) + facet_wrap(~cand_office_state) + geom_area(size=7)+labs(title= actual_states, face="bold",size=25)+labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 ```
 
