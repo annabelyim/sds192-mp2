@@ -6,6 +6,7 @@ output:
   html_document:
     code_folding: hide
 ---
+### Political Parties That Won in Swing States and the Contributions Received
 
 ```{r, message = FALSE, warning = FALSE, include=FALSE, echo = TRUE}
 library(tidyverse)
@@ -32,7 +33,7 @@ candidates_florida <-
 candidates_elections_florida <- 
   merge(elections_florida, candidates_florida, by.x="fec_id", by.y="cand_id") %>%
   filter(ge_winner == "W") 
-# Because fec_id = cand_id, we used the merge function to combine both elections_florida and candidates_florida data sets. Also, since we want only the winners of the elections, we filtered out the winners using the filter function. 
+#Because fec_id = cand_id, we used the merge function to combine both elections_florida and candidates_florida data sets. Also, since we want only the winners of the elections, we filtered out the winners using the filter function. 
 
 ```
 
@@ -64,6 +65,12 @@ combined_candidates_contributions <-
 # In order to match the transaction amount to the candidates, merged the two data frames to get the information about the candidate and the transaction amount to be combined in one data frame. Then, in order to find how many districts were won by Democrats and Republicans, we grouped the data frame by party, and then found how many Democrats and Republicans won by using the summarize function by finding the number of rows that were either Democrats or Republicans. 
 ```
 
+
+The following data graphics show the correlation between the number of districts that won per political party in the 2011-2012 general election cycle for each state and the total contributions made to the party. The following data graphics were created by using the data that came from the Federal Election Commission.
+
+The data graphics have x-axis that represents the contribution in million dollars and the y-axis is the district that won. The total contributions is the sum of all of the transaction types that are not transaction type "24A." "24A" is a transaction type that was used in opposition of the winning candidates. Thus, we are only focusing on the transactions that were made in support for the winning candidates. The geom area represents the party winning to contributions. The colors represent the winning political parties clearly by using red for Republicans and blue for Democrats. 
+
+Florida is considered as one of the "perennial" swing states that have been regularly seen as close contests over the last few presidential campaigns. In the 2012 election, the Republican party won in 17 districts and lost in 10 to Democrats. Its transaction per party was almost the double of the Republican. We can conclude that the contribution made to each party can have a significant impact on the results of an election in a swing state like Florida.
 
 ```{r, message = FALSE, warning = FALSE, echo = TRUE}
 ggplot(data= combined_candidates_contributions, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party))+ geom_area(size=7)+labs(title= "Florida", face="bold",size=25)+labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -111,15 +118,27 @@ combined_candidates_contributions <-
 ```
 
 
+Swing states are those in which neither major political party holds a lock on the outcome of presidential elections. The states that are known to side with either a Republican or Democratic presidential candidate are Colorado, Florida, Iowa, Michigan, Minnesota, North Carolina, New Hampshire,  Nevada, Ohio, Pennsylvania, Virginia and Wisconsin. In order to determine how much material contributions matter in elections in swing states, we made a function that takes the argument “state” and makes a graph of the winning party to contribution, and then we added the names of the most swing states as arguments. Like Florida, we also used the geom area to represent the winning party and the contribution and changed in the colors to represent the winning political parties by setting red for Republicans and blue for Democrats. 
+
+
 ```{r, message = FALSE, warning = FALSE, echo = TRUE}
 actual_states <- c("FL","CO","NV","OH","IA","MI","MN","NH","NC","WI","PA","VA")
 
 my_data <- map_df(actual_states, elec_contrib) 
 
-  ggplot(data= my_data, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party)) + facet_wrap(~cand_office_state, ncol = 4) + geom_area(size=2) + labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(limits = c(0, 20), breaks = c(0,5,10,15,20), expand = c(0, 0)) + scale_x_continuous(limits = c(0, 15), breaks = c(3, 6, 9, 12, 15), expand = c(0, 0))
+  ggplot(data= my_data, aes(y = num_districts_won , x = total_transaction_per_party, color= party, fill=party)) + facet_wrap(~cand_office_state, ncol = 4) + geom_area(size=2) + labs(y= "number of districts that won")+labs(x= "contributions in millions per party")+scale_color_manual(values = c("blue4", "darkred"))+scale_fill_manual(values = c("blue4", "darkred"))+theme(panel.background = element_rect(fill = '#92BDD4'))+theme(plot.background = element_rect(fill = 'white'))+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + scale_y_continuous(limits = c(0, 20), breaks = c(0,5,10,15,20), expand = c(0, 0)) + scale_x_continuous(limits = c(0, 15), breaks = c(3, 6, 9, 12, 15), expand = c(0, 0)) +
+labs(title= "Swing States", face="bold",size=25)
+
 
 ```
+  
 
+In order to compare all of the swing states side by side, the facet_wrap function was used by faceting by the states. When we look at all of the data graphics of the swing states, all of the states except New Hampshire where only Democrats won the district election, and Nevada where both Democrats and Republicans won the same number of districts, we can see that contributions made to each party have a significant impact on the results of the election. All of the swing states except Nevada and New Hampshire with parties that are on the most right side of the x-axis have higher bar graphs, and this signifies that the parties with the higher contributions of the x-axis also had higher turnouts on the elections with more districts that won per party. Even in Nevada, both Democrats and Republicans won the same number of districts, and the quantity of contributions was very similar. Thus, from these data graphics conclude that contributions are influential to the outcome of an election.
+
+
+```{r, message = FALSE, warning = FALSE, echo = TRUE}
+wordcountaddin:::text_stats()
+```
 
 
 ^[[Link to the GitHub Repository](https://github.com/annabelyim/sds192-mp2.git)]
